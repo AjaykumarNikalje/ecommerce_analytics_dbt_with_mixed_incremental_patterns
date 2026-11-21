@@ -1,0 +1,40 @@
+unit_tests:
+  - name: silver_customers_backfill_uses_customer_creation_date
+    model: silver_customers
+    overrides:
+      macros:
+        is_incremental: true
+      vars:
+        silver_backfill:
+          start_date: '2026-11-01'
+          end_date: '2026-11-02'
+    given:
+      - input: ref('bronze_customers')
+        rows:
+          - {customer_id: '1001', customer_name: 'Original', source_created_at: '2026-11-01 00:00:00', source_updated_at: '2026-11-01 01:00:00', cdc_operation: INSERT}
+          - {customer_id: '1001', customer_name: 'Updated', source_created_at: '2026-11-01 00:00:00', source_updated_at: '2026-11-05 01:00:00', cdc_operation: UPDATE}
+          - {customer_id: '1002', source_created_at: '2026-11-02 00:00:00', source_updated_at: '2026-11-02 01:00:00', cdc_operation: INSERT}
+          - {customer_id: '1003', source_created_at: '2026-10-31 23:59:59', source_updated_at: '2026-11-01 01:00:00', cdc_operation: UPDATE}
+    expect:
+      rows:
+        - {customer_id: 1001, customer_name: 'Updated', customer_creation_date: '2026-11-01', cdc_operation: UPDATE, is_deleted: false}
+
+  - name: silver_orders_backfill_uses_order_date
+    model: silver_orders
+    overrides:
+      macros:
+        is_incremental: true
+      vars:
+        silver_backfill:
+          start_date: '2026-11-01'
+          end_date: '2026-11-02'
+    given:
+      - input: ref('bronze_orders')
+        rows:
+          - {order_id: '2001', order_date: '2026-11-01', source_created_at: '2026-10-31 00:00:00', source_updated_at: '2026-11-01 01:00:00', cdc_operation: INSERT}
+          - {order_id: '2001', order_date: '2026-11-01', source_created_at: '2026-10-31 00:00:00', source_updated_at: '2026-11-05 01:00:00', cdc_operation: DELETE}
+          - {order_id: '2002', order_date: '2026-11-02', source_created_at: '2026-11-01 00:00:00', source_updated_at: '2026-11-02 01:00:00', cdc_operation: INSERT}
+          - {order_id: '2003', order_date: '2026-10-31', source_created_at: '2026-10-31 00:00:00', source_updated_at: '2026-11-01 01:00:00', cdc_operation: UPDATE}
+    expect:
+      rows:
+        - {order_id: 2001, order_date: '2026-11-01', cdc_operation: DELETE, is_deleted: true}

@@ -1,0 +1,44 @@
+version: 2
+
+seeds:
+  - name: landing_customers_cdc
+    description: Sample landing events for customer changes.
+    config:
+      column_types:
+        customer_id: bigint
+        customer_name: string
+        email: string
+        city: string
+        customer_status: string
+        source_created_at: timestamp
+        source_updated_at: timestamp
+        cdc_operation: string
+        landing_ingested_at: timestamp
+    columns:
+      - name: cdc_operation
+        data_tests:
+          - not_null
+      - name: landing_ingested_at
+        data_tests:
+          - not_null
+
+  - name: landing_orders_cdc
+    description: Sample landing events for order changes.
+    config:
+      column_types:
+        order_id: bigint
+        customer_id: bigint
+        order_amount: decimal(18,2)
+        order_status: string
+        order_date: date
+        source_created_at: timestamp
+        source_updated_at: timestamp
+        cdc_operation: string
+        landing_ingested_at: timestamp
+    columns:
+      - name: cdc_operation
+        data_tests:
+          - not_null
+      - name: landing_ingested_at
+        data_tests:
+          - not_null

@@ -1,0 +1,30 @@
+
+    
+    select
+      count(*) as failures,
+      count(*) != 0 as should_warn,
+      count(*) != 0 as should_error
+    from (
+      
+    
+  with key_counts as (
+    select
+        customer_id,
+        is_deleted,
+        silver_created_at,
+        silver_updated_at,
+        count(*) over (partition by customer_id) as key_count
+    from `ecommerce_analytics_poc`.`ecommerce`.`silver_customers`
+)
+
+select *
+from key_counts
+where customer_id is null
+    or key_count > 1
+    or is_deleted is null
+    or silver_created_at is null
+    or silver_updated_at is null
+  
+  
+      
+    ) dbt_internal_test

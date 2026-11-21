@@ -1,0 +1,99 @@
+version: 2
+
+models:
+  - name: silver_customers
+    config:
+      materialized: incremental
+      incremental_strategy: merge
+      unique_key:
+        - customer_id
+        - customer_creation_date
+      matched_condition: DBT_INTERNAL_SOURCE.source_updated_at > DBT_INTERNAL_DEST.source_updated_at
+      file_format: delta
+      on_schema_change: fail
+      merge_exclude_columns:
+        - silver_created_at
+        - source_created_at
+        - customer_creation_date
+      contract:
+        enforced: true
+    columns:
+      - name: customer_id
+        data_type: bigint
+        constraints:
+          - type: not_null
+      - name: customer_name
+        data_type: string
+      - name: email
+        data_type: string
+      - name: city
+        data_type: string
+      - name: customer_status
+        data_type: string
+      - name: customer_creation_date
+        data_type: date
+      - name: source_created_at
+        data_type: timestamp
+      - name: source_updated_at
+        data_type: timestamp
+      - name: cdc_operation
+        data_type: string
+      - name: is_deleted
+        data_type: boolean
+        constraints:
+          - type: not_null
+      - name: silver_created_at
+        data_type: timestamp
+        constraints:
+          - type: not_null
+      - name: silver_updated_at
+        data_type: timestamp
+        constraints:
+          - type: not_null
+  - name: silver_orders
+    config:
+      materialized: incremental
+      incremental_strategy: merge
+      unique_key:
+        - order_id
+        - order_date
+      matched_condition: DBT_INTERNAL_SOURCE.source_updated_at > DBT_INTERNAL_DEST.source_updated_at
+      file_format: delta
+      on_schema_change: fail
+      merge_exclude_columns:
+        - silver_created_at
+        - source_created_at
+        - order_date
+      contract:
+        enforced: true
+    columns:
+      - name: order_id
+        data_type: bigint
+        constraints:
+          - type: not_null
+      - name: customer_id
+        data_type: bigint
+      - name: order_amount
+        data_type: decimal(18,2)
+      - name: order_status
+        data_type: string
+      - name: order_date
+        data_type: date
+      - name: source_created_at
+        data_type: timestamp
+      - name: source_updated_at
+        data_type: timestamp
+      - name: cdc_operation
+        data_type: string
+      - name: is_deleted
+        data_type: boolean
+        constraints:
+          - type: not_null
+      - name: silver_created_at
+        data_type: timestamp
+        constraints:
+          - type: not_null
+      - name: silver_updated_at
+        data_type: timestamp
+        constraints:
+          - type: not_null

@@ -1,0 +1,46 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: Current customer dimension, including soft-deleted customers.
+    config:
+      materialized: incremental
+      incremental_strategy: merge
+      unique_key:
+        - customer_id
+        - customer_creation_date
+      matched_condition: DBT_INTERNAL_SOURCE.silver_updated_at > DBT_INTERNAL_DEST.silver_updated_at
+      file_format: delta
+      on_schema_change: fail
+    columns:
+      - name: customer_sk
+        description: Stable dbt_utils surrogate key derived from customer_id.
+
+  - name: fact_orders
+    description: Current order facts, including soft-deleted orders.
+    config:
+      materialized: incremental
+      incremental_strategy: merge
+      unique_key:
+        - order_id
+        - order_date
+      matched_condition: DBT_INTERNAL_SOURCE.silver_updated_at > DBT_INTERNAL_DEST.silver_updated_at
+      file_format: delta
+      on_schema_change: fail
+    columns:
+      - name: order_sk
+        description: Stable dbt_utils surrogate key derived from order_id.
+      - name: customer_sk
+        description: Customer dimension surrogate key, null when customer_id is null.
+
+  - name: gld_customer_summary
+    description: Order activity and completed sales per non-deleted customer, excluding soft-deleted orders.
+    config:
+      materialized: materialized_view
+    columns:
+      - name: customer_sk
+        description: Customer dimension surrogate key. One row per customer.
+      - name: completed_sales_amount
+        description: Total order amount for orders currently in COMPLETED status.
+      - name: latest_order_date
+        description: Latest order date across non-deleted orders, null for customers without orders.

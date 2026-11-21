@@ -1,0 +1,66 @@
+version: 2
+
+models:
+  - name: bronze_customers
+    description: Raw customer CDC events streamed from the landing seed.
+    config:
+      materialized: streaming_table
+      contract:
+        enforced: true
+    columns:
+      - name: customer_id
+        data_type: string
+      - name: customer_name
+        data_type: string
+      - name: email
+        data_type: string
+      - name: city
+        data_type: string
+      - name: customer_status
+        data_type: string
+      - name: source_created_at
+        data_type: string
+      - name: source_updated_at
+        data_type: string
+      - name: cdc_operation
+        data_type: string
+      - name: landing_ingested_at
+        data_type: timestamp
+      - name: bronze_ingested_at
+        data_type: timestamp
+        constraints:
+          - type: not_null
+        data_tests:
+          - not_null
+
+  - name: bronze_orders
+    description: Raw order CDC events streamed from the landing seed.
+    config:
+      materialized: streaming_table
+      contract:
+        enforced: true
+    columns:
+      - name: order_id
+        data_type: string
+      - name: customer_id
+        data_type: string
+      - name: order_amount
+        data_type: string
+      - name: order_status
+        data_type: string
+      - name: order_date
+        data_type: string
+      - name: source_created_at
+        data_type: string
+      - name: source_updated_at
+        data_type: string
+      - name: cdc_operation
+        data_type: string
+      - name: landing_ingested_at
+        data_type: timestamp
+      - name: bronze_ingested_at
+        data_type: timestamp
+        constraints:
+          - type: not_null
+        data_tests:
+          - not_null

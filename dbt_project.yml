@@ -1,0 +1,19 @@
+name: e_commerce
+version: '1.0.0'
+config-version: 2
+
+profile: ecommerce_dbt_project_final
+require-dbt-version: [">=1.10.0", "<2.0.0"]
+
+model-paths: [models]
+analysis-paths: [analysis]
+seed-paths: [seeds]
+test-paths: [tests]
+macro-paths: [macros]
+
+packages-install-path: dbt_packages
+clean-targets: [target, dbt_packages]
+
+seeds:
+  e_commerce:
+    +quote_columns: false

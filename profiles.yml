@@ -4,8 +4,8 @@ ecommerce_dbt_project_final:
     dev:
       type: databricks
       host: <host>
-      http_path: /sql/1.0/warehouses/3b6ac5ee7320e98a
+      http_path: <http_path>
       token: <token>
-      catalog: ecommerce_analytics_poc
-      schema: ecommerce
+      catalog: <catalog>
+      schema: <schema>
       threads: 2
